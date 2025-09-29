@@ -1,0 +1,172 @@
+/*
+ * login.css - Estilos específicos para la página de Acceso de Edición (login.html).
+ * Se carga después de base.css y styles.css.
+ */
+
+/* ========================================================================= */
+/* 1. LAYOUT GENERAL DEL LOGIN */
+/* ========================================================================= */
+
+.login-body {
+    display: flex;
+    flex-direction: column; /* Organiza header y main verticalmente */
+    min-height: 100vh; 
+    background-color: var(--bg-dark); /* Asegura el fondo oscuro */
+}
+
+.header {
+    /* Estilo del header tomado de styles.css, pero lo aseguramos */
+    background-color: var(--bg-dark);
+    border-bottom: 2px solid var(--primary-color);
+    padding: var(--spacing-unit) 0;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-content .name {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.header-content .title {
+    color: var(--text-secondary);
+    margin-right: auto; /* Empuja el botón a la derecha */
+    margin-left: 20px;
+}
+
+/* Contenedor principal para el formulario de login. Queremos que ocupe el centro */
+.main-login-content {
+    flex-grow: 1; /* Ocupa el espacio restante */
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Centrado perfecto en el espacio disponible */
+    padding: 20px;
+}
+
+
+/* ========================================================================= */
+/* 2. FORMULARIO Y INPUTS */
+/* ========================================================================= */
+
+.login-container {
+    background-color: var(--bg-surface);
+    padding: 40px;
+    border-radius: var(--border-radius, 8px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    max-width: 420px; /* Ancho máximo limpio */
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.login-title {
+    color: var(--text-color);
+    font-size: 2rem;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    text-align: left;
+}
+
+.form-label {
+    display: block; 
+    text-align: left; 
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--text-secondary); /* Color más suave para el label */
+    font-size: 0.95rem;
+}
+
+/* Clase de input universal (form-input) */
+.form-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: var(--bg-dark); 
+    color: var(--text-color);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box; 
+    font-size: 1rem;
+}
+
+.form-input:focus {
+    border-color: var(--primary-color);
+    /* Sombra más sutil y limpia */
+    box-shadow: 0 0 5px rgba(0, 204, 255, 0.5); 
+    outline: none;
+}
+
+/* ========================================================================= */
+/* 3. BOTÓN Y MENSAJES */
+/* ========================================================================= */
+
+.login-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    /* Usa las variables y estilos de botón del base/styles.css */
+    background-color: var(--primary-color);
+    color: var(--bg-dark);
+    font-weight: bold;
+}
+
+.login-btn:hover {
+    background-color: #00e5ff; /* Tono de hover de primary */
+}
+
+.message {
+    margin-top: 15px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Botón "Volver al Portafolio" */
+.action-button.back-button {
+    background: none;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 8px 15px; 
+    font-weight: normal;
+}
+.action-button.back-button:hover {
+    background-color: rgba(0, 204, 255, 0.1);
+}
+
+/* ========================================================================= */
+/* 4. MEDIA QUERIES */
+/* ========================================================================= */
+
+@media (max-width: 500px) {
+    .login-container {
+        padding: 30px 20px;
+        max-width: 95%; 
+    }
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .header-content .title {
+        margin: 5px 0 15px 0;
+    }
+    .action-button.back-button {
+        align-self: flex-end;
+    }
+    .login-title {
+        font-size: 1.8rem;
+    }
+}

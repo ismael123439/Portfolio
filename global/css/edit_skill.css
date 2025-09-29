@@ -1,0 +1,349 @@
+/*
+ * edit_skill.css - Estilos específicos para el Panel de Edición (edit_skills.html)
+ * Asume que styles.css ya está cargado para colores y tipografía base.
+ */
+
+/* ========================================================================= */
+/* 1. LAYOUT PRINCIPAL Y HEADER */
+/* ========================================================================= */
+
+.header {
+    background-color: var(--bg-dark); /* Color de fondo oscuro */
+    border-bottom: 2px solid var(--primary-color); /* Línea de color primario */
+    padding: calc(var(--spacing-unit) * 1) 0;
+    margin-bottom: calc(var(--spacing-unit) * 1.5);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px; /* Espacio entre elementos del header */
+}
+
+.header-content .name {
+    font-size: 2.2rem;
+    color: var(--primary-color);
+    margin: 0;
+    flex-grow: 1;
+}
+
+.header-content .title {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin: 0;
+    white-space: nowrap; /* Evita que el subtítulo se rompa */
+}
+
+.action-button.back-button {
+    background-color: var(--bg-surface);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    padding: 10px 15px;
+    border-radius: 4px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.action-button.back-button:hover {
+    background-color: var(--bg-dark-alt);
+    border-color: var(--primary-color);
+}
+
+/* ========================================================================= */
+/* 2. SECCIONES GENERALES */
+/* ========================================================================= */
+
+.main-edit {
+    padding-bottom: calc(var(--spacing-unit) * 3);
+}
+
+.section-title {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: var(--spacing-unit);
+    margin-top: calc(var(--spacing-unit) * 2); /* Espacio superior para separar secciones */
+}
+
+.message {
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+/* ========================================================================= */
+/* 3. FORMULARIO DE CONFIGURACIÓN GENERAL (GRID) */
+/* ========================================================================= */
+
+.settings-form-grid {
+    display: grid;
+    /* Dos columnas: una estrecha para la etiqueta, una ancha para el input */
+    grid-template-columns: auto 1fr; 
+    gap: 15px 25px; /* Espacio vertical y horizontal */
+    align-items: center;
+    max-width: 800px; /* Limita el ancho del formulario */
+}
+
+.settings-form-grid label {
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-align: right;
+    padding-right: 10px;
+}
+
+.settings-form-grid input,
+.settings-form-grid textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--bg-dark-alt);
+    color: var(--text-color);
+    font-size: 1rem;
+    box-sizing: border-box; /* Incluir padding y borde en el ancho total */
+    resize: vertical; /* Permitir redimensionar solo verticalmente para textareas */
+}
+
+.settings-form-grid textarea {
+    min-height: 50px;
+}
+
+/* Botón de Guardar en la sección de configuración */
+.action-button.update-btn {
+    grid-column: 1 / span 2; /* Ocupa las dos columnas */
+    width: 250px; 
+    justify-self: left; /* Alineado a la izquierda */
+    background-color: var(--success-color); /* Color verde para guardar */
+    color: var(--bg-dark);
+    font-weight: bold;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.action-button.update-btn:hover {
+    opacity: 0.9;
+}
+
+
+/* ========================================================================= */
+/* 4. FORMULARIO AÑADIR SKILL */
+/* ========================================================================= */
+
+.add-form-grid {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.add-form-grid input,
+.add-form-grid select {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--bg-dark-alt);
+    color: var(--text-color);
+    font-size: 1rem;
+    flex-grow: 1;
+}
+
+.add-form-grid select {
+    width: 200px; /* Ancho fijo para el select de tipo */
+    flex-grow: 0;
+}
+
+.action-button.add-button {
+    background-color: var(--primary-color);
+    color: var(--bg-dark);
+    font-weight: bold;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+}
+
+.action-button.add-button:hover {
+    opacity: 0.9;
+}
+
+
+/* ========================================================================= */
+/* 5. TABLA DE SKILLS (LISTADO) */
+/* ========================================================================= */
+
+#skillsTable {
+    width: 100%;
+    border-collapse: separate; /* Permite border-spacing */
+    border-spacing: 0 5px; /* Espacio entre filas */
+    margin-top: 15px;
+}
+
+#skillsTable th,
+#skillsTable td {
+    padding: 12px;
+    text-align: left;
+    border: none;
+}
+
+#skillsTable thead th {
+    background-color: var(--bg-surface);
+    color: var(--primary-color);
+    font-weight: bold;
+    border-bottom: 2px solid var(--primary-color);
+    position: sticky; /* Fija el encabezado */
+    top: 0;
+    z-index: 10;
+}
+
+/* Estilo de la fila de cabecera de grupo (el toggle) */
+.type-header {
+    background-color: var(--bg-dark-alt);
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.type-header:hover {
+    background-color: var(--bg-surface);
+}
+
+.type-header td {
+    padding: 15px 12px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border-color);
+}
+
+.type-header strong {
+    color: var(--primary-color);
+}
+
+.toggle-icon {
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+    margin-right: 5px;
+}
+
+/* Estilo de la fila de skill individual */
+.skill-row td {
+    background-color: var(--bg-dark);
+    border-bottom: 1px solid var(--bg-dark-alt);
+    transition: background-color 0.15s;
+}
+
+.skill-row:hover td {
+    background-color: var(--bg-dark-alt);
+}
+
+/* Las filas colapsadas deben estar ocultas */
+.skill-row.collapsed {
+    display: none;
+}
+
+/* Estilos dentro de las celdas de la tabla */
+.skill-row input[type="text"],
+.skill-row select {
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    background-color: var(--bg-dark-alt);
+    color: var(--text-color);
+    width: 90%;
+}
+
+.skill-row select {
+    min-width: 120px;
+}
+
+.skill-row button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: opacity 0.2s;
+}
+
+.skill-row .update-btn {
+    background-color: var(--success-color);
+    color: var(--bg-dark);
+}
+
+.skill-row .delete-btn {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.skill-row .update-btn:hover,
+.skill-row .delete-btn:hover {
+    opacity: 0.8;
+}
+
+/* Estilos de mensajes */
+.error-message {
+    color: var(--danger-color) !important;
+    font-weight: bold;
+}
+
+/* ========================================================================= */
+/* 6. RESPONSIVE (Móviles y Tablets) */
+/* ========================================================================= */
+
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header-content .title,
+    .action-button.back-button {
+        margin-top: 10px;
+    }
+
+    .settings-form-grid {
+        grid-template-columns: 1fr; /* Una sola columna en móvil */
+        gap: 15px;
+    }
+    
+    .settings-form-grid label {
+        text-align: left; /* Etiquetas encima de los campos */
+    }
+
+    /* El botón de guardar ocupa todo el ancho */
+    .action-button.update-btn {
+        grid-column: 1;
+        width: 100%;
+        justify-self: stretch;
+    }
+
+    .add-form-grid {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .add-form-grid select {
+        width: 100%;
+    }
+
+    /* Tabla de skills: Ocultamos columnas poco importantes para ahorrar espacio */
+    #skillsTable th:nth-child(1), 
+    #skillsTable td:nth-child(1) { 
+        display: none; /* Oculta la columna ID */
+    }
+    
+    /* Hacemos los botones más grandes */
+    .skill-row button {
+        width: 48%; /* Para que quepan dos botones por celda */
+        margin-right: 0;
+        box-sizing: border-box;
+    }
+}

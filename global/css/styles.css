@@ -1,0 +1,53 @@
+/*
+ * styles.css - Estilos de layout principal y navegación comunes a todas las páginas.
+ * (Actualizado para el patrón "Sticky Footer")
+ */
+
+/* ========================================================================= */
+/* 1. STICKY FOOTER PATTERN (Asegura que el footer esté abajo) */
+/* ========================================================================= */
+
+body {
+    /* Necesario para el patrón Sticky Footer */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; 
+}
+
+/* El elemento <main> debe crecer para empujar el footer hacia abajo */
+main {
+    flex-grow: 1; 
+    padding-bottom: var(--spacing-unit);
+}
+
+
+/* ========================================================================= */
+/* 2. LAYOUT GENERAL Y CONTENEDOR */
+/* ========================================================================= */
+
+section {
+    padding: calc(var(--spacing-unit) * 1.5) 0;
+}
+
+/* Títulos de sección generales */
+.section-heading {
+    color: var(--text-color);
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-unit);
+    text-align: left; /* Títulos alineados a la izquierda del contenedor */
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+/* ========================================================================= */
+/* 3. FOOTER (Pie de página) */
+/* ========================================================================= */
+
+.footer {
+    background-color: var(--bg-dark);
+    border-top: 2px solid var(--border-color);
+    padding: var(--spacing-unit) 0;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}

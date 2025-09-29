@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Edición - Portafolio</title>
+   <link rel="stylesheet" href="css/styles.css?v=2"> 
+<link rel="stylesheet" href="css/edit_skill.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-content">
+            <h1 class="name">Panel de Edición</h1>
+            <p class="title">Administrar Contenido</p>
+            <button onclick="window.location.href='/'" class="action-button back-button">
+                ← Volver al Portafolio
+            </button>
+        </div>
+    </header>
+
+    <main class="main-edit">
+        <div class="container">
+            
+            <section class="settings-section">
+                <h2 class="section-title">1. Configuración General</h2>
+                <div class="settings-form-grid">
+                    <label for="fullNameInput">Nombre Completo:</label>
+                    <input type="text" id="fullNameInput" data-setting-key="FullName">
+
+                    <label for="subtitleInput">Subtítulo (Header):</label>
+                    <textarea id="subtitleInput" data-setting-key="HeaderSubtitle" rows="2"></textarea>
+
+                    <label for="emailInput">Correo Electrónico:</label>
+                    <input type="email" id="emailInput" data-setting-key="Email">
+                    
+                    <label for="phoneInput">Teléfono:</label>
+                    <input type="text" id="phoneInput" data-setting-key="Phone">
+                    
+                    <label for="locationInput">Ubicación:</label>
+                    <textarea id="locationInput" data-setting-key="Location" rows="3"></textarea>
+                </div>
+                <button onclick="saveSettings()" class="action-button update-btn" style="margin-top: 20px;">
+                    Guardar Configuración
+                </button>
+                <p id="settings-message" class="message"></p>
+            </section>
+            
+            <section class="add-skill-section">
+                <h2 class="section-title">2. Añadir Nueva Skill</h2>
+                <div class="add-form-grid">
+                    <input type="text" id="skillNameInput" placeholder="Nombre de la Skill (Ej: Flask)" required>
+                    
+                    <select id="skillTypeSelect" required>
+                        <option value="" disabled selected>Selecciona el Tipo</option>
+                        <option value="Frontend">Frontend</option>
+                        <option value="Backend">Backend</option>
+                        <option value="Bases de Datos">Bases de Datos</option>
+                        <option value="DevOps / Cloud">DevOps / Cloud</option>
+                        <option value="Herramientas">Herramientas</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                    
+                    <button onclick="addSkill()" class="action-button add-button">Añadir Skill</button>
+                </div>
+                <p id="add-message" class="message"></p>
+            </section>
+
+            <section class="list-skill-section">
+                <h2 class="section-title">3. Skills Actuales</h2>
+                <table id="skillsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Tipo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="4" id="loading-skills">Cargando skills...</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+        </div>
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSettingsForm(); // Carga los datos personales al iniciar
+            fetchSkills();      // Carga la lista de skills
+        });
+
+        // Referencias a elementos del DOM
+        const skillsTableBody = document.querySelector('#skillsTable tbody');
+        const loadingSkills = document.getElementById('loading-skills');
+        const addMessage = document.getElementById('add-message');
+        const settingsMessage = document.getElementById('settings-message');
+        
+        // Claves de configuración que vamos a cargar y guardar
+        const SETTINGS_FIELDS = ['FullName', 'HeaderSubtitle', 'Email', 'Phone', 'Location'];
+
+        // --- FUNCIÓN DE CARGA DE CONFIGURACIÓN ---
+        function loadSettingsForm() {
+            settingsMessage.textContent = 'Cargando configuración...';
+            settingsMessage.style.color = 'orange'; // Mensaje de carga
+
+            const fetchPromises = SETTINGS_FIELDS.map(key => {
+                const inputElement = document.querySelector(`[data-setting-key="${key}"]`);
+                if (!inputElement) return Promise.resolve();
+
+                return fetch(`/api/settings/${key}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.SettingValue) {
+                            inputElement.value = data.SettingValue;
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Error al cargar ${key}:`, error);
+                        return Promise.reject(error);
+                    });
+            });
+
+            Promise.allSettled(fetchPromises)
+                .then(results => {
+                    const hasError = results.some(result => result.status === 'rejected');
+                    if (!hasError) {
+                        settingsMessage.textContent = 'Configuración cargada.';
+                        settingsMessage.style.color = 'var(--text-secondary)'; 
+                    } else {
+                        settingsMessage.textContent = 'Advertencia: Algunos campos no se pudieron cargar.';
+                        settingsMessage.style.color = 'red';
+                    }
+                });
+        }
+        
+        // --- FUNCIÓN DE GUARDAR CONFIGURACIÓN ---
+        function saveSettings() {
+            settingsMessage.textContent = 'Guardando...';
+            settingsMessage.style.color = 'orange';
+
+            const promises = SETTINGS_FIELDS.map(key => {
+                const inputElement = document.querySelector(`[data-setting-key="${key}"]`);
+                const value = inputElement ? inputElement.value : '';
+
+                return fetch('/api/settings/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ SettingKey: key, SettingValue: value })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) throw new Error(data.message || `Error al guardar ${key}`);
+                    return true;
+                })
+                .catch(error => {
+                    console.error(error);
+                    return false;
+                });
+            });
+
+            Promise.all(promises).then(results => {
+                const allSuccess = results.every(r => r === true);
+                if (allSuccess) {
+                    settingsMessage.textContent = '¡Configuración guardada con éxito!';
+                    settingsMessage.style.color = 'var(--success-color)';
+                } else {
+                    settingsMessage.textContent = 'Error: No se pudieron guardar todos los campos.';
+                    settingsMessage.style.color = 'var(--danger-color)';
+                }
+            });
+        }
+
+        // --- FUNCIÓN DE LECTURA DE SKILLS CON PLEGADO ---
+        function fetchSkills() {
+            skillsTableBody.innerHTML = '<tr><td colspan="4" id="loading-skills">Cargando skills...</td></tr>';
+            
+            fetch('/api/skills')
+                .then(response => {
+                    if (!response.ok) throw new Error('Error de red o servidor.');
+                    return response.json();
+                })
+                .then(groupedData => {
+                    skillsTableBody.innerHTML = ''; // Limpiar la tabla
+                    let rowCount = 0;
+
+                    // Itera sobre los Tipos de Skill (Backend, Frontend, etc.)
+                    for (const type in groupedData) {
+                        const skillsArray = groupedData[type];
+                        // Limpiamos el nombre del tipo para usarlo en el nombre de la clase
+                        const cleanType = type.replace(/\s|\/|\(|\)/g, '_').toLowerCase(); 
+                        
+                        // Fila de encabezado para cada grupo
+                        const typeHeader = document.createElement('tr');
+                        typeHeader.classList.add('type-header');
+                        // Usamos un atributo para identificar el grupo a colapsar
+                        typeHeader.setAttribute('data-type-toggle', cleanType); 
+                        typeHeader.innerHTML = `
+                            <td colspan="4">
+                                <strong class="toggle-icon">▶</strong> 
+                                <strong>${type} (${skillsArray.length})</strong>
+                            </td>
+                        `;
+                        skillsTableBody.appendChild(typeHeader);
+                        
+                        // Filas de skills individuales
+                        skillsArray.forEach(skill => {
+                            const row = document.createElement('tr');
+                            row.setAttribute('data-id', skill.Id);
+                            // Las filas de skill inician plegadas por defecto (clase 'collapsed')
+                            row.classList.add('skill-row', 'collapsed', `skill-group-${cleanType}`); 
+                            row.innerHTML = `
+                                <td>${skill.Id}</td>
+                                <td><input type="text" value="${skill.SkillName}" data-field="SkillName"></td>
+                                <td>
+                                    <select data-field="SkillType">
+                                        ${['Frontend', 'Backend', 'Bases de Datos', 'DevOps / Cloud', 'Herramientas', 'Otros'].map(t => 
+                                            `<option value="${t}" ${t === type ? 'selected' : ''}>${t}</option>`
+                                        ).join('')}
+                                    </select>
+                                </td>
+                                <td>
+                                    <button onclick="updateSkill(${skill.Id})" class="action-button update-btn">Guardar</button>
+                                    <button onclick="deleteSkill(${skill.Id})" class="action-button delete-btn">Borrar</button>
+                                </td>
+                            `;
+                            skillsTableBody.appendChild(row);
+                            rowCount++;
+                        });
+                    }
+
+                    if (rowCount === 0) {
+                        skillsTableBody.innerHTML = '<tr><td colspan="4">No hay skills cargadas.</td></tr>';
+                    } else {
+                        setupToggle(); // Inicializa la funcionalidad de plegado/desplegado
+                    }
+                })
+                .catch(error => {
+                    skillsTableBody.innerHTML = `<tr><td colspan="4" class="error-message">Error al cargar: ${error.message}</td></tr>`;
+                });
+        }
+
+        // --- FUNCIÓN PARA CONFIGURAR PLEGADO/DESPLEGADO ---
+        function setupToggle() {
+            document.querySelectorAll('[data-type-toggle]').forEach(header => {
+                // Previene múltiples listeners si fetchSkills se llama varias veces
+                header.removeEventListener('click', toggleSkillGroup); 
+                header.addEventListener('click', toggleSkillGroup);
+            });
+        }
+        
+        function toggleSkillGroup(event) {
+            const header = event.currentTarget;
+            const cleanType = header.getAttribute('data-type-toggle');
+            
+            // Alternar la visibilidad de todas las filas con la clase de grupo
+            document.querySelectorAll(`.skill-group-${cleanType}`).forEach(row => {
+                row.classList.toggle('collapsed');
+            });
+            
+            // Cambiar el indicador (▶ a ▼ y viceversa)
+            const indicator = header.querySelector('.toggle-icon');
+            if (indicator.textContent === '▶') {
+                indicator.textContent = '▼';
+            } else {
+                indicator.textContent = '▶';
+            }
+        }
+
+        // --- FUNCIÓN DE AÑADIR ---
+        function addSkill() {
+            const skillName = document.getElementById('skillNameInput').value;
+            const skillType = document.getElementById('skillTypeSelect').value;
+            
+            if (!skillName || !skillType) {
+                addMessage.textContent = 'Error: Debe rellenar el Nombre y seleccionar un Tipo.';
+                addMessage.style.color = 'var(--danger-color)';
+                return;
+            }
+            
+            addMessage.textContent = 'Añadiendo...';
+            addMessage.style.color = 'orange';
+
+            fetch('/api/skills/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ SkillName: skillName, SkillType: skillType })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    addMessage.textContent = 'Skill añadida con éxito!';
+                    addMessage.style.color = 'var(--success-color)';
+                    document.getElementById('skillNameInput').value = ''; 
+                    document.getElementById('skillTypeSelect').value = ''; 
+                    fetchSkills(); // Recargar la tabla
+                } else {
+                    addMessage.textContent = 'Error al añadir skill: ' + data.message;
+                    addMessage.style.color = 'var(--danger-color)';
+                }
+            })
+            .catch(error => {
+                addMessage.textContent = 'Error de red al añadir skill.';
+                addMessage.style.color = 'var(--danger-color)';
+            });
+        }
+        
+        // --- FUNCIÓN DE ACTUALIZAR ---
+        function updateSkill(id) {
+            const row = document.querySelector(`tr[data-id="${id}"]`);
+            const newName = row.querySelector('input[data-field="SkillName"]').value;
+            const newType = row.querySelector('select[data-field="SkillType"]').value;
+            
+            if (!newName || !newType) {
+                 alert('Error: Nombre y Tipo de Skill son requeridos.');
+                 return;
+            }
+
+            fetch('/api/skills/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ Id: id, SkillName: newName, SkillType: newType })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Skill actualizada con éxito!');
+                    fetchSkills(); // Recargar la tabla para reflejar cambios
+                } else {
+                    alert('Error al actualizar: ' + data.message);
+                }
+            })
+            .catch(error => alert('Error de red al actualizar skill.'));
+        }
+
+        // --- FUNCIÓN DE BORRAR ---
+        function deleteSkill(id) {
+            if (!confirm('¿Estás seguro de que quieres eliminar esta skill?')) return;
+            
+            fetch('/api/skills/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ Id: id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Skill eliminada con éxito.');
+                    fetchSkills(); // Recargar la tabla
+                } else {
+                    alert('Error al borrar: ' + data.message);
+                }
+            })
+            .catch(error => alert('Error de red al borrar skill.'));
+        }
+    </script>
+    
+</body>
+</html>

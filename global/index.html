@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portafolio | Ismael Medrano</title>
+    
+    <link rel="stylesheet" href="css/base.css"> 
+    <link rel="stylesheet" href="css/styles.css"> 
+    <link rel="stylesheet" href="css/portfolio.css"> 
+</head>
+<body>
+    
+    <header class="hero-section"> 
+        <div class="container hero-content">
+            <div class="hero-text-centered"> 
+                <h1 class="name" id="dynamic-full-name">Cargando Nombre...</h1>
+                <p class="title" id="dynamic-subtitle">Cargando descripción...</p>
+                
+                <a href="login.html" class="login-button">
+                    Login para Editar
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="skills-section">
+            <div class="container">
+                <h2 class="section-heading">Skills Actuales</h2>
+                <div class="skills-grid" id="skills-container">
+                    <p id="loading-message" class="text-secondary">Cargando datos...</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="contact-section">
+            <div class="container">
+                <h2 class="section-heading">Contacto</h2>
+                <div class="contact-links" id="contact-details-container">
+                    <p class="text-secondary">Cargando detalles de contacto...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 <span id="footer-name">Ismael Medrano</span>. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        const settingsMap = {
+            'FullName': 'dynamic-full-name',
+            'HeaderSubtitle': 'dynamic-subtitle',
+            'Email': 'dynamic-email',
+            'Phone': 'dynamic-phone',
+            'Location': 'dynamic-location',
+        };
+
+        function createContactLink(label, value, href) {
+            const linkDiv = document.createElement('div');
+            linkDiv.classList.add('contact-link');
+
+            const labelSpan = document.createElement('span');
+            labelSpan.classList.add('contact-label');
+            labelSpan.textContent = label;
+            linkDiv.appendChild(labelSpan);
+
+            if (href) {
+                const link = document.createElement('a');
+                link.href = href;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                link.classList.add('text-primary');
+
+                const valueSpan = document.createElement('span');
+                valueSpan.classList.add('contact-value'); 
+                valueSpan.textContent = value;
+                link.appendChild(valueSpan);
+                linkDiv.appendChild(link);
+            } else {
+                const valueSpan = document.createElement('span');
+                valueSpan.classList.add('contact-value');
+                valueSpan.textContent = value;
+                linkDiv.appendChild(valueSpan);
+            }
+            
+            return linkDiv;
+        }
+
+        function loadSettings() {
+            const contactContainer = document.getElementById('contact-details-container');
+            const contactElements = {};
+            
+            const fetchPromises = Object.keys(settingsMap).map(key => {
+                return fetch(`/api/settings/${key}`)
+                    .then(response => response.ok ? response.json() : null)
+                    .then(data => {
+                        const value = data ? data.SettingValue : `[${key} (No DB)]`;
+                        const element = document.getElementById(settingsMap[key]);
+                        
+                        if (element) element.textContent = value;
+                        if (key === 'FullName') document.getElementById('footer-name').textContent = value;
+                        
+                        contactElements[key] = value;
+                    })
+                    .catch(error => {
+                        console.error(`Error al cargar ${key}:`, error);
+                        contactElements[key] = `[Error]`;
+                    });
+            });
+            
+            Promise.all(fetchPromises).then(() => {
+                contactContainer.innerHTML = ''; 
+                
+                contactContainer.appendChild(createContactLink(
+                    'Correo Electrónico', 
+                    contactElements.Email, 
+                    `mailto:${contactElements.Email}`
+                ));
+
+                contactContainer.appendChild(createContactLink(
+                    'Teléfono', 
+                    contactElements.Phone, 
+                    `tel:${contactElements.Phone ? contactElements.Phone.replace(/\s/g, '') : ''}`
+                ));
+
+                contactContainer.appendChild(createContactLink(
+                    'Ubicación', 
+                    contactElements.Location, 
+                    null
+                ));
+
+                contactContainer.appendChild(createContactLink(
+                    'LinkedIn', 
+                    'ismael-medrano', 
+                    'https://www.linkedin.com/in/ismael-medrano/'
+                ));
+            });
+        }
+
+        function loadSkills() {
+            const container = document.getElementById('skills-container');
+            const loading = document.getElementById('loading-message');
+
+            fetch('/api/skills')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al obtener datos del servidor: ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(groupedData => {
+                    loading.style.display = 'none';
+                    container.innerHTML = ''; 
+
+                    for (const type in groupedData) {
+                        const typeCard = document.createElement('div');
+                        typeCard.classList.add('skill-type-card'); 
+                        
+                        typeCard.innerHTML = `<h3 class="type-title">${type}</h3>`; 
+                        
+                        const tagContainer = document.createElement('div');
+                        tagContainer.classList.add('inner-skills-list'); 
+
+                        const skillsArray = groupedData[type];
+
+                        skillsArray.forEach(skill => {
+                            const skillItem = document.createElement('span');
+                            skillItem.classList.add('skill-item'); 
+                            skillItem.textContent = skill.SkillName;
+                            tagContainer.appendChild(skillItem);
+                        });
+
+                        typeCard.appendChild(tagContainer);
+                        container.appendChild(typeCard);
+                    }
+
+                    if (Object.keys(groupedData).length === 0) {
+                        container.innerHTML = '<p class="text-secondary">No hay Skills cargadas en la base de datos.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al obtener skills:', error);
+                    loading.textContent = 'Error al cargar los datos de Skills. Revisa la consola (F12) para el detalle.';
+                    loading.style.display = 'block'; 
+                    loading.classList.add('text-danger');
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+            loadSkills();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+/*
+ * base.css - Estilos base y variables globales para todo el proyecto.
+ * Incluye: Reset, Tipografía y Variables CSS.
+ */
+
+/* ========================================================================= */
+/* 1. VARIABLES CSS (Root) */
+/* ========================================================================= */
+
+:root {
+    /* COLORES PRINCIPALES (Diseño Oscuro) */
+    --primary-color: #00ccff;       /* Turquesa vibrante (para enlaces, botones, títulos) */
+    --secondary-color: #ff9900;     /* Naranja o un color secundario para acentos */
+
+    /* COLORES DE FONDO Y SUPERFICIE */
+    --bg-dark: #121212;             /* Fondo más oscuro (cuerpo, inputs) */
+    --bg-surface: #1e1e1e;          /* Fondo de tarjetas, secciones, contenedores */
+    --bg-surface-alt: #2c2c2c;      /* Fondo alternativo o sutil para hover/agrupaciones */
+
+    /* COLORES DE TEXTO */
+    --text-color: #ffffff;          /* Texto principal (blanco puro o casi) */
+    --text-secondary: #aaaaaa;      /* Texto secundario, descripciones, labels */
+
+    /* COLORES DE ESTADO */
+    --success-color: #4CAF50;       /* Verde para éxito/guardado */
+    --danger-color: #f44336;        /* Rojo para error/borrar */
+
+    /* LAYOUT Y ESPACIADO */
+    --spacing-unit: 20px;           /* Unidad de espaciado base */
+    --border-radius: 8px;           /* Radio de borde estándar */
+    --border-color: #333333;        /* Color sutil para bordes y divisores */
+
+    /* TIPOGRAFÍA */
+    --font-family-base: 'Arial', sans-serif; /* Puedes cambiarla a 'Poppins', 'Roboto', etc. */
+}
+
+/* ========================================================================= */
+/* 2. CSS RESET Y ESTILOS DE ELEMENTOS BÁSICOS */
+/* ========================================================================= */
+
+/* Un reset moderno para eliminar márgenes y paddings por defecto */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    /* Define el tamaño base de la fuente (10px) para facilitar los REMs (1rem = 10px) */
+    font-size: 62.5%; 
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-color);
+    font-family: var(--font-family-base);
+    font-size: 1.6rem; /* Esto hace que el tamaño base sea 16px */
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* Enlaces */
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+/* Títulos */
+h1, h2, h3, h4 {
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+}
+
+h1 { font-size: 3.2rem; }
+h2 { font-size: 2.5rem; }
+h3 { font-size: 2.0rem; }
+
+/* Listas */
+ul {
+    list-style: none;
+}
+
+/* Botones (Estilo base, se sobrescribe con clases específicas) */
+button {
+    cursor: pointer;
+    border: none;
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius);
+    transition: background-color 0.2s, opacity 0.2s;
+}
+
+/* ========================================================================= */
+/* 3. CLASES DE UTILIDAD (UTILITY CLASSES) */
+/* ========================================================================= */
+
+/* Contenedor principal que centra el contenido y le da un ancho máximo */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    /* Un pequeño padding horizontal para evitar que el contenido toque los bordes */
+    padding: 0 var(--spacing-unit); 
+}
+
+/* Clase de coloración para texto */
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.text-secondary {
+    color: var(--text-secondary) !important;
+}
+
+/* Clases de color para fondos */
+.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+.bg-surface {
+    background-color: var(--bg-surface) !important;
+}

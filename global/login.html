@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso de Edición | Ismael Medrano</title>
+    
+    <link rel="stylesheet" href="css/base.css"> 
+    <link rel="stylesheet" href="css/styles.css"> 
+    <link rel="stylesheet" href="css/login.css"> </head>
+
+<body class="login-body">
+    
+    <header class="header">
+        <div class="container header-content">
+            <h1 class="name">Acceso de Edición</h1>
+            <p class="title">Ingresa con tus credenciales de administrador.</p>
+            
+            <a href="index.html" class="action-button back-button">
+                Volver al Portafolio
+            </a>
+        </div>
+    </header>
+    
+    <main class="main-login-content"> 
+        <div class="login-container">
+            
+            <h2 class="login-title">Administración</h2>
+
+            <form id="login-form" class="login-form">
+                
+                <div class="form-group">
+                    <label for="username" class="form-label">Usuario</label>
+                    <input type="text" id="username" class="form-input" placeholder="Nombre de usuario" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <input type="password" id="password" class="form-input" placeholder="Contraseña" required>
+                </div>
+                
+                <button type="submit" class="action-button login-btn">Ingresar</button>
+                
+                <p id="message" class="message"></p>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const messageElement = document.getElementById('message');
+
+            messageElement.textContent = 'Verificando...';
+            messageElement.style.color = 'var(--text-secondary)'; 
+
+            fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ UserName: username, Password: password })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => Promise.reject(data));
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    messageElement.textContent = 'Login exitoso. Redirigiendo...';
+                    messageElement.style.color = 'var(--success-color)';
+                    window.location.href = data.redirect; 
+                }
+            })
+            .catch(errorData => {
+                messageElement.textContent = errorData.message || 'Error de conexión o credenciales inválidas.';
+                messageElement.style.color = 'var(--danger-color)';
+            });
+        });
+    </script>
+</body>
+</html>
